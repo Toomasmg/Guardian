@@ -1,0 +1,389 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard Maestro - Guardian{% endblock %}
+
+{% block extra_css %}
+<style>
+    .main-wrapper { background-color: var(--bg-panel); border-radius: 24px; padding: 2rem; box-shadow: var(--shadow-soft); border: 1px solid var(--border-soft); transition: 0.3s; }
+
+    .stat-card { background-color: var(--bg-panel); border-radius: 16px; padding: 1.5rem; box-shadow: var(--shadow-card); border: 1px solid var(--border-soft); display: flex; justify-content: space-between; align-items: flex-start; height: 100%; transition: transform 0.2s, background-color 0.3s; }
+    .stat-card:hover { transform: translateY(-3px); border-color: var(--accent-gold); }
+    .card-link { text-decoration: none; color: inherit; }
+    
+    .stat-label { font-size: 0.75rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+    .stat-value { font-size: 2rem; font-weight: 800; color: var(--text-main); margin: 5px 0; }
+    .stat-subtitle { font-size: 0.8rem; font-weight: 600; }
+    
+    .icon-box { width: 45px; height: 45px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; transition: 0.3s; }
+    .icon-green { background-color: var(--status-green-bg); color: var(--status-green); }
+    .icon-brown { background-color: var(--status-brown-bg); color: var(--accent-gold-dark); }
+    .icon-red { background-color: var(--status-red-bg); color: var(--status-red); }
+
+    .accordion-item { border: none; background: transparent; }
+    .accordion-button { background-color: var(--bg-panel); color: var(--text-main); font-weight: 800; border-radius: 16px !important; border: 1px solid var(--border-soft); box-shadow: var(--shadow-card); padding: 1.2rem; transition: 0.3s; }
+    .accordion-button:not(.collapsed) { background-color: var(--bg-panel); color: var(--text-main); box-shadow: none; border-bottom-left-radius: 0 !important; border-bottom-right-radius: 0 !important; border-bottom: none;}
+    .accordion-button:focus { box-shadow: none; }
+    .accordion-collapse { border: 1px solid var(--border-soft); border-top: none; border-bottom-left-radius: 16px; border-bottom-right-radius: 16px; background-color: var(--bg-panel); transition: 0.3s; }
+    .form-label { font-size: 0.65rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase; margin-bottom: 0.2rem; }
+
+    .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; border-bottom: 1px solid var(--border-soft); padding-bottom: 0.5rem; }
+    .section-title { font-size: 1.1rem; font-weight: 800; display: flex; align-items: center; gap: 8px; color: var(--text-main); }
+    
+    .btn-excel { background-color: var(--status-green-bg); color: var(--status-green); border: 1px solid var(--status-green); border-radius: 6px; font-size: 0.75rem; font-weight: 700; padding: 0.2rem 0.6rem; text-decoration: none; transition: 0.2s; }
+    
+    .search-wrapper { position: relative; }
+    .search-wrapper input { background-color: var(--input-bg); border: 1px solid var(--border-soft); border-radius: 50px; padding: 0.4rem 1rem 0.4rem 2.5rem; font-size: 0.85rem; width: 350px; color: var(--text-main); transition: 0.3s; }
+    .search-wrapper input:focus { background-color: var(--input-bg-focus); border-color: var(--accent-gold); outline: none; }
+    .search-wrapper i { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-muted); }
+
+    .table-custom { width: 100%; margin-bottom: 0; color: var(--text-main); transition: 0.3s; }
+    .table-custom th { font-size: 0.7rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase; border-bottom: none; padding: 1rem 0.5rem; }
+    .table-custom td { padding: 1rem 0.5rem; vertical-align: middle; border-bottom: 1px solid var(--border-soft); font-weight: 600; font-size: 0.9rem; }
+    .table-custom tbody tr:last-child td { border-bottom: none; }
+    
+    .badge-type { background-color: var(--status-brown-bg); color: var(--text-muted); border-radius: 4px; padding: 0.2rem 0.5rem; font-size: 0.7rem; }
+    .badge-status-active { background-color: var(--status-green); color: #fff; border-radius: 6px; padding: 0.3rem 0.6rem; font-size: 0.7rem; font-weight: 700;}
+    .badge-status-expired { background-color: var(--status-red); color: #fff; border-radius: 6px; padding: 0.3rem 0.6rem; font-size: 0.7rem; font-weight: 700;}
+    .badge-status-suspended { background-color: var(--status-brown); color: #fff; border-radius: 6px; padding: 0.3rem 0.6rem; font-size: 0.7rem; font-weight: 700;}
+
+    .action-group { display: flex; gap: 6px; justify-content: flex-end; }
+    .btn-action { width: 32px; height: 32px; border-radius: 8px; border: none; display: flex; align-items: center; justify-content: center; color: white; transition: 0.2s; }
+    .btn-action:hover { opacity: 0.8; transform: translateY(-1px); }
+    .btn-wa { background-color: var(--status-green); }
+    .btn-edit { background-color: var(--status-brown); }
+    .btn-trash { background-color: var(--status-red); }
+    
+    .api-key-box { display: inline-flex; width: fit-content; align-items: center; background: var(--input-bg); border: 1px solid var(--border-soft); border-radius: 6px; padding: 2px 6px; transition: 0.3s; }
+    .api-key-box input { border: none; background: transparent; width: 130px; font-size: 0.75rem; color: var(--text-muted); outline: none; padding-left: 5px; }
+    .api-key-box button { border: none; background: transparent; color: var(--text-muted); cursor: pointer; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="app-container">
+
+    <header class="d-flex justify-content-between align-items-center w-100 pt-4 pb-4">
+        <a href="/" class="d-flex align-items-center text-decoration-none" style="gap: 15px;">
+            <img src="{{ url_for('static', filename='guardian.png') }}" alt="Guardian" style="height: 65px">
+        </a>
+        
+        <div class="d-flex align-items-center gap-3">
+            <button id="themeToggle" class="btn d-flex align-items-center justify-content-center" style="width: 42px; height: 42px; border-radius: 50%; background-color: var(--bg-panel); border: 1px solid var(--border-soft); color: var(--accent-gold-dark); box-shadow: var(--shadow-card); transition: 0.3s;" title="Cambiar Tema">
+                <i class="bi bi-moon-fill fs-6" id="themeIcon"></i>
+            </button>
+
+            <div class="d-flex align-items-center gap-2" style="background-color: var(--bg-panel); border: 1px solid var(--border-soft); border-radius: 50px; padding: 0.3rem 0.3rem 0.3rem 1rem; box-shadow: var(--shadow-card);">
+                <div style="width: 32px; height: 32px; border-radius: 50%; background-color: var(--accent-gold); display: flex; align-items: center; justify-content: center; color: white;"><i class="bi bi-person"></i></div>
+                <span style="color: var(--text-main); font-weight: 700; font-size: 0.9rem;">{{ current_user.username }}</span>
+                <i class="bi bi-chevron-down text-muted mx-1" style="font-size: 0.7rem;"></i>
+                <a href="/logout" class="btn btn-sm" style="background-color: var(--status-brown); color: #fff; border-radius: 50px; padding: 0.3rem 1.2rem; font-weight: 700;">Salir</a>
+            </div>
+        </div>
+    </header>
+
+    <div class="main-wrapper mt-2">
+        
+        <div class="row g-4 mb-4">
+            <div class="col-md-4">
+                <div class="stat-card">
+                    <div>
+                        <div class="stat-label">Ingresos Estimados</div>
+                        <div class="stat-value">${{ stats.revenue }}</div>
+                        <div class="stat-subtitle" style="color: var(--status-green);"><i class="bi bi-diamond-fill me-1" style="font-size: 0.6rem;"></i>Mensual</div>
+                    </div>
+                    <div class="icon-box icon-green shadow-sm"><i class="bi bi-cash-stack"></i></div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <a href="/?status=active" class="card-link">
+                    <div class="stat-card">
+                        <div>
+                            <div class="stat-label">Clientes Activos</div>
+                            <div class="stat-value">{{ stats.active }} <span class="text-muted fs-5">/ {{ stats.total }}</span></div>
+                            <div class="stat-subtitle text-muted"><i class="bi bi-shield-check me-1"></i>Sistemas al día</div>
+                        </div>
+                        <div class="icon-box icon-brown shadow-sm"><i class="bi bi-people-fill"></i></div>
+                    </div>
+                </a>
+            </div>
+            <div class="col-md-4">
+                <a href="/?status=expired" class="card-link">
+                    <div class="stat-card" style="border: 1px solid var(--status-red-bg);">
+                        <div>
+                            <div class="stat-label">Requieren Atención</div>
+                            <div class="stat-value">{{ stats.expired }}</div>
+                            <div class="stat-subtitle" style="color: var(--status-red);"><i class="bi bi-exclamation-triangle me-1"></i>Vencidos o Bloqueados</div>
+                        </div>
+                        <div class="icon-box icon-red shadow-sm"><i class="bi bi-exclamation-triangle-fill"></i></div>
+                    </div>
+                </a>
+            </div>
+        </div>
+
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert border alert-dismissible fade show shadow-sm" style="background-color: var(--bg-panel); border-color: var(--accent-gold) !important; color: var(--status-brown);">
+                        <i class="bi bi-info-circle me-2" style="color: var(--accent-gold);"></i>{{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <div class="accordion mb-4" id="accordionForm">
+            <div class="accordion-item">
+                <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne">
+                        <i class="bi bi-key text-muted me-2" style="transform: rotate(45deg);"></i> Registrar Nuevo Cliente
+                    </button>
+                </h2>
+                <div id="collapseOne" class="accordion-collapse collapse" data-bs-parent="#accordionForm">
+                    <div class="accordion-body p-4">
+                        <form action="/create_license" method="POST">
+                            <div class="row g-3">
+                                <div class="col-md-3">
+                                    <label class="form-label">Negocio</label>
+                                    <input type="text" name="business_name" class="form-control" placeholder="Ej: Taller El Rayo" required>
+                                </div>
+                                <div class="col-md-2">
+                                    <label class="form-label w-100 d-flex justify-content-between">
+                                        Rubro <a href="#" data-bs-toggle="modal" data-bs-target="#modalCategory" class="text-decoration-none" style="color: var(--accent-gold);"><i class="bi bi-plus-circle-fill"></i></a>
+                                    </label>
+                                    <select name="app_type" class="form-select">
+                                        {% for cat in categories %}
+                                            <option value="{{ cat.name }}">{{ cat.name }}</option>
+                                        {% else %}
+                                            <option value="General">General</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label">Nombre Dueño</label>
+                                    <input type="text" name="owner_name" class="form-control" required>
+                                </div>
+                                <div class="col-md-2">
+                                    <label class="form-label">DNI / CUIT</label>
+                                    <input type="text" name="owner_dni" class="form-control" placeholder="Opcional">
+                                </div>
+                                <div class="col-md-2">
+                                    <label class="form-label">WhatsApp</label>
+                                    <input type="text" name="phone" class="form-control" placeholder="549..." required>
+                                </div>
+                                
+                                <div class="col-md-5">
+                                    <label class="form-label">Email</label>
+                                    <input type="email" name="email" class="form-control" placeholder="Para contacto">
+                                </div>
+                                <div class="col-md-2">
+                                    <label class="form-label" style="color: var(--accent-gold-dark);">Precio $</label>
+                                    <input type="number" name="price" class="form-control" value="10000" step="0.01" min="0">
+                                </div>
+                                <div class="col-md-2">
+                                    <label class="form-label">Días Iniciales</label>
+                                    <input type="number" name="days" class="form-control" value="30">
+                                </div>
+                                <div class="col-md-3 d-flex align-items-end">
+                                    <button type="submit" class="btn-gradient-gold w-100 py-2 d-flex justify-content-center align-items-center gap-2">
+                                        <i class="bi bi-key-fill" style="transform: rotate(45deg);"></i> Generar Licencia
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section-header mt-5">
+            <div class="section-title">
+                <i class="bi bi-key text-muted" style="transform: rotate(45deg);"></i> Cartera Completa
+                <a href="/export_data" class="btn-excel ms-3"><i class="bi bi-file-earmark-excel"></i> Excel</a>
+            </div>
+            
+            <form action="/" method="GET" class="search-wrapper">
+                <i class="bi bi-search"></i>
+                <input type="text" name="q" placeholder="Buscar negocio o DNI..." value="{{ search_query or '' }}">
+                {% if status_filter or search_query %}
+                    <a href="/" class="position-absolute text-muted" style="right: 15px; top: 50%; transform: translateY(-50%); text-decoration: none;"><i class="bi bi-x-circle-fill"></i></a>
+                {% endif %}
+            </form>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table-custom">
+                <thead>
+                    <tr>
+                        <th>Negocio</th>
+                        <th>Contacto / DNI</th>
+                        <th>API Key (Sistema)</th>
+                        <th>Precio</th>
+                        <th>Estado</th>
+                        <th>Vencimiento</th>
+                        <th class="text-end">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for lic in licenses %}
+                    {% set days_left = (lic.expiration_date - now).days %}
+                    
+                    {% set wa_msg = "Hola " + lic.owner_name + ", te contactamos por tu sistema." %}
+                    {% if not lic.is_active %}
+                         {% set wa_msg = "Hola " + lic.owner_name + ", tu sistema está SUSPENDIDO. Por favor regularizar pago." %}
+                    {% elif days_left < 0 %}
+                         {% set wa_msg = "Hola " + lic.owner_name + ", tu licencia venció hace " + (days_left * -1)|string + " días. Debes renovar." %}
+                    {% elif days_left < 5 %}
+                         {% set wa_msg = "Hola " + lic.owner_name + ", recordatorio: tu licencia vence en " + days_left|string + " días." %}
+                    {% endif %}
+
+                    <tr>
+                        <td>
+                            <strong style="color: var(--text-main);">{{ lic.business_name }}</strong><br>
+                            <span class="badge-type mt-1 d-inline-block">{{ lic.app_type }}</span>
+                        </td>
+                        
+                        <td>
+                            <span style="color: var(--text-main);">{{ lic.owner_name }}</span><br>
+                            <small class="text-muted fw-bold">
+                                {% if lic.owner_dni %}DNI: {{ lic.owner_dni }}{% else %}--{% endif %}
+                            </small>
+                        </td>
+                        
+                        <td>
+                            <div class="api-key-box mb-1">
+                                <input type="text" value="{{ lic.api_key }}" id="key-{{ loop.index }}" readonly>
+                                <button type="button" onclick="copyToClipboard('key-{{ loop.index }}')" title="Copiar"><i class="bi bi-files"></i></button>
+                            </div>
+                            <div>
+                                {% if lic.hardware_id %}
+                                    <small class="text-muted fw-bold" style="font-size: 0.75rem;"><i class="bi bi-pc-display me-1" style="color: var(--status-green);"></i>Vinculado</small>
+                                {% else %}
+                                    <small class="text-muted" style="font-size: 0.75rem;">Sin vincular</small>
+                                {% endif %}
+                            </div>
+                        </td>
+                        
+                        <td>
+                            <span style="color: var(--accent-gold-dark); font-weight: 800;">${{ lic.price or 0 }}</span>
+                        </td>
+                        
+                        <td>
+                            {% if not lic.is_active %}
+                                <span class="badge-status-suspended">BLOQUEADO</span>
+                            {% elif days_left < 0 %}
+                                <span class="badge-status-expired">VENCIDO</span>
+                            {% else %}
+                                <span class="badge-status-active">ACTIVO</span>
+                            {% endif %}
+                        </td>
+                        
+                        <td>
+                            <span style="color: {{ 'var(--status-red)' if days_left < 0 else 'var(--text-main)' }}; font-weight: 800;">{{ lic.expiration_date.strftime('%d/%m') }}</span><br>
+                            <small class="text-muted fw-bold" style="color: {{ 'var(--status-red)' if days_left < 5 else 'var(--text-muted)' }} !important;">
+                                ({{ days_left }}d)
+                            </small>
+                        </td>
+                        
+                        <td>
+                            <div class="action-group">
+                                {% if lic.phone %}
+                                    <a href="https://wa.me/{{ lic.phone }}?text={{ wa_msg }}" target="_blank" class="btn-action btn-wa" title="Enviar WhatsApp">
+                                        <i class="bi bi-whatsapp"></i>
+                                    </a>
+                                {% endif %}
+                                
+                                <form action="/reset_hwid/{{ lic.id }}" method="POST" class="d-inline" onsubmit="return confirm('¿Desvincular la PC de este cliente?');">
+                                    <button class="btn-action btn-edit" title="Liberar Licencia (Reset PC)">
+                                        <i class="bi bi-link-45deg"></i>
+                                    </button>
+                                </form>
+
+                                <button type="button" class="btn-action btn-edit" data-bs-toggle="modal" data-bs-target="#modalDays{{ lic.id }}" title="Renovar/Modificar">
+                                    <i class="bi bi-card-list"></i>
+                                </button>
+
+                                <form action="/toggle/{{ lic.id }}" method="POST" class="d-inline">
+                                    <button class="btn-action btn-edit" style="background-color: {{ 'var(--status-red)' if not lic.is_active else 'var(--status-brown)' }}" title="{{ 'Reactivar' if not lic.is_active else 'Suspender' }}">
+                                        <i class="bi {{ 'bi-play-fill' if not lic.is_active else 'bi-pause-fill' }}"></i>
+                                    </button>
+                                </form>
+                                
+                                <form action="/delete/{{ lic.id }}" method="POST" class="d-inline" onsubmit="return confirm('¿Estás seguro de ELIMINAR este cliente?');">
+                                    <button class="btn-action btn-trash" title="Eliminar"><i class="bi bi-trash"></i></button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <div class="modal fade" id="modalDays{{ lic.id }}" tabindex="-1">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header border-0 pb-0">
+                                    <h6 class="modal-title fw-bold" style="color: var(--status-brown);">Gestión: {{ lic.business_name }}</h6>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <form action="/renew/{{ lic.id }}" method="POST" class="mb-4 border-bottom pb-4" style="border-color: var(--border-soft) !important;">
+                                        <label class="form-label" style="color: var(--text-main);">Renovación Rápida</label>
+                                        <button class="btn-gradient-gold w-100 py-2" type="submit">Renovar 1 Mes (+30 días)</button>
+                                    </form>
+
+                                    <form action="/modify_days/{{ lic.id }}" method="POST">
+                                        <label class="form-label" style="color: var(--text-main);">Ajuste Manual</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text bg-transparent text-muted" style="border-color: var(--border-soft);">Días</span>
+                                            <input type="number" name="days" class="form-control" placeholder="Ej: 5 o -5" required>
+                                            <button class="btn text-white" style="background-color: var(--status-brown);" type="submit">Aplicar</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% else %}
+                    <tr><td colspan="7" class="text-center py-5 text-muted"><i class="bi bi-inbox fs-2 d-block mb-2"></i>No se encontraron licencias.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div> <div class="modal fade" id="modalCategory" tabindex="-1">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-header border-0 pb-0">
+                <h6 class="modal-title fw-bold" style="color: var(--status-brown);">Agregar Rubro</h6>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form action="/add_category" method="POST">
+                    <div class="mb-3">
+                        <input type="text" name="category_name" class="form-control" placeholder="Ej: Farmacia" required autofocus>
+                    </div>
+                    <button type="submit" class="btn-gradient-gold w-100 py-2">Guardar Rubro</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function copyToClipboard(elementId) {
+        var copyText = document.getElementById(elementId);
+        copyText.select();
+        copyText.setSelectionRange(0, 99999); 
+        
+        navigator.clipboard.writeText(copyText.value).then(function() {
+            var btn = copyText.nextElementSibling;
+            var originalIcon = btn.innerHTML;
+            
+            btn.innerHTML = '<i class="bi bi-check-lg" style="color: var(--status-green);"></i>';
+            setTimeout(function() {
+                btn.innerHTML = originalIcon;
+            }, 1500);
+        }).catch(err => console.error('Error al copiar: ', err));
+    }
+</script>
+{% endblock %}

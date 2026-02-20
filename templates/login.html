@@ -1,0 +1,246 @@
+{% extends "base.html" %}
+
+{% block title %}Acceso Maestro - Guardian{% endblock %}
+
+{% block body_class %}body-auth{% endblock %}
+
+{% block extra_css %}
+<style>
+    .outer-frame {
+        padding: 1.2rem;
+        border-radius: 1.5rem;
+        border: 2px solid rgba(199, 164, 122, 0.15);
+        background: transparent;
+        box-shadow: inset 0 0 30px rgba(139, 115, 85, 0.05);
+        width: 100%;
+        max-width: 520px; /* Ensanchado */
+        position: relative;
+    }
+
+    [data-theme="dark"] .outer-frame {
+        border: 2px solid rgba(171, 134, 88, 0.1);
+        box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.3);
+    }
+
+    .login-card {
+        background-color: var(--bg-panel);
+        border-radius: 1rem;
+        padding: 2.5rem 3.5rem; /* Más espacio horizontal, menos vertical */
+        box-shadow: var(--shadow-soft), 0 0 0 1px var(--border-soft);
+    }
+
+    .brand-logo-container {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+
+    .brand-logo-container img {
+        height: 60px;
+        object-fit: contain;
+        margin-bottom: 0.5rem;
+    }
+
+    .brand-subtitle {
+        font-size: 0.8rem;
+        color: var(--text-muted);
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        font-weight: 700;
+    }
+
+    .form-label {
+        font-weight: 800;
+        color: var(--text-main);
+        font-size: 0.9rem;
+        margin-bottom: 0.4rem;
+    }
+
+    .input-group {
+        background-color: var(--input-bg);
+        border: 1px solid var(--border-soft);
+        border-radius: 8px;
+        transition: 0.3s;
+        overflow: hidden;
+        margin-bottom: 1.2rem;
+    }
+    
+    .input-group:focus-within {
+        border-color: var(--accent-gold);
+        box-shadow: 0 0 0 0.2rem rgba(199, 164, 122, 0.15);
+        background-color: var(--input-bg-focus);
+    }
+
+    .input-group-text {
+        background-color: transparent;
+        border: none;
+        color: var(--text-muted);
+        padding-right: 0.5rem;
+        padding-left: 1rem;
+    }
+
+    .form-control {
+        border: none;
+        background-color: transparent;
+        padding-left: 0.5rem;
+        font-weight: 600;
+        color: var(--text-main);
+        height: 45px;
+    }
+    
+    .form-control:focus {
+         box-shadow: none;
+         background-color: transparent;
+    }
+
+    .btn-login {
+        width: 100%;
+        font-size: 1.05rem;
+        padding: 0.8rem;
+        margin-top: 1rem;
+        background: linear-gradient(180deg, #f5eadd 0%, #e2cba9 100%);
+        color: #45362b;
+        border: 1px solid #cfae85;
+        font-weight: 800;
+        border-radius: 8px;
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6), 0 2px 4px rgba(139, 115, 85, 0.15);
+        transition: 0.2s;
+    }
+    
+    .btn-login:hover {
+        background: linear-gradient(180deg, #faefdf 0%, #e6cfad 100%);
+        transform: translateY(-1px);
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8), 0 4px 8px rgba(139, 115, 85, 0.2);
+    }
+    
+    [data-theme="dark"] .btn-login {
+        background: linear-gradient(180deg, #c7a47a 0%, #9e794c 100%);
+        color: #161412;
+        border: 1px solid #735532;
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 2px 4px rgba(0, 0, 0, 0.5);
+    }
+    
+    [data-theme="dark"] .btn-login:hover {
+        background: linear-gradient(180deg, #d3b48e 0%, #ab8658 100%);
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.3), 0 4px 8px rgba(0, 0, 0, 0.6);
+    }
+
+    .forgot-link {
+        font-size: 0.85rem;
+        color: var(--text-muted);
+        text-decoration: none;
+        transition: 0.2s;
+        font-weight: 600;
+    }
+    
+    .forgot-link:hover {
+        color: var(--accent-gold-dark);
+    }
+
+    .divider {
+        height: 1px;
+        background-color: var(--border-soft);
+        margin: 1.5rem 0;
+    }
+
+    .theme-toggle-login {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: var(--bg-panel);
+        border: 1px solid var(--border-soft);
+        color: var(--accent-gold-dark);
+        width: 42px;
+        height: 42px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        box-shadow: var(--shadow-card);
+        transition: 0.3s;
+        z-index: 1000;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<button id="themeToggle" class="theme-toggle-login" title="Cambiar Tema">
+    <i class="bi bi-moon-fill" id="themeIcon"></i>
+</button>
+
+<div class="outer-frame">
+    <div class="login-card">
+        <div class="brand-logo-container">
+            <img src="{{ url_for('static', filename='guardian.png') }}" alt="Guardian Logo">
+            <div class="brand-subtitle">Gestión Centralizada</div>
+        </div>
+        
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-dismissible fade show shadow-sm" style="background-color: var(--status-red-bg); color: var(--status-red); border: 1px solid var(--status-red); border-radius: 8px; font-size: 0.85rem; padding: 0.5rem 1rem; margin-bottom: 1.5rem;" role="alert">
+                        <i class="bi bi-exclamation-octagon me-2"></i>{{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" style="padding: 0.75rem;"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <form method="POST">
+            <div>
+                <label class="form-label">Usuario</label>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-person-fill"></i></span>
+                    <input type="text" name="username" class="form-control" placeholder="Admin" required autofocus>
+                </div>
+            </div>
+
+            <div>
+                <div class="d-flex justify-content-between align-items-end mb-1">
+                    <label class="form-label mb-0">Contraseña</label>
+                    <a href="/reset_password" class="forgot-link">¿Olvidaste la clave?</a>
+                </div>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-key-fill" style="transform: rotate(45deg);"></i></span>
+                    <input type="password" name="password" class="form-control" id="passwordInput" placeholder="••••••" required>
+                    <button class="btn input-group-text" type="button" id="togglePassword" style="border-left: 1px solid var(--border-soft); border-radius: 0; padding-left: 15px; padding-right: 15px;">
+                        <i class="bi bi-eye-slash-fill" id="eyeIcon"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <button type="submit" class="btn-login">
+                Ingresar al Sistema
+            </button>
+
+            <div class="divider"></div>
+
+            <div class="text-center">
+                <span style="color: var(--text-muted); font-size: 0.85rem; font-weight: 600;">¿Nuevo administrador?</span>
+                <a href="/register" class="text-decoration-none" style="color: var(--text-main); font-weight: 800; font-size: 0.85rem; margin-left: 5px;">Crear cuenta</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    const togglePasswordBtn = document.querySelector('#togglePassword');
+    const passwordInput = document.querySelector('#passwordInput');
+    const eyeIconBtn = document.querySelector('#eyeIcon');
+
+    if(togglePasswordBtn) {
+        togglePasswordBtn.addEventListener('click', function () {
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+            
+            if (type === 'text') {
+                eyeIconBtn.classList.replace('bi-eye-slash-fill', 'bi-eye-fill');
+            } else {
+                eyeIconBtn.classList.replace('bi-eye-fill', 'bi-eye-slash-fill');
+            }
+        });
+    }
+</script>
+{% endblock %}

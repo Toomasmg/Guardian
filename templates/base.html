@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Guardian{% endblock %}</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-page: #f2ebe1;
+            --bg-panel: #fdfaf5;
+            --text-main: #45362b;
+            --text-muted: #8b7a6c;
+            --accent-gold: #c7a47a;
+            --accent-gold-dark: #ab8658;
+            --border-soft: #e8ded3;
+            --status-green: #6c8c6c;
+            --status-green-bg: #e6eee6;
+            --status-red: #a85858;
+            --status-red-bg: #f4e6e6;
+            --status-brown: #5d493b;
+            --status-brown-bg: #eee6dc;
+            --shadow-soft: 0 10px 25px rgba(139, 115, 85, 0.08);
+            --shadow-card: 0 4px 15px rgba(139, 115, 85, 0.05);
+            --input-bg: transparent;
+            --input-bg-focus: #ffffff;
+        }
+
+        [data-theme="dark"] {
+            --bg-page: #161412;
+            --bg-panel: #211e1b;
+            --text-main: #e8ded3;
+            --text-muted: #a39689;
+            --border-soft: #38322d;
+            --status-green: #8ab58a;
+            --status-green-bg: #233023;
+            --status-red: #d16b6b;
+            --status-red-bg: #3d2222;
+            --status-brown: #967a65;
+            --status-brown-bg: #2b2521;
+            --shadow-soft: 0 10px 25px rgba(0, 0, 0, 0.5);
+            --shadow-card: 0 4px 15px rgba(0, 0, 0, 0.3);
+            --input-bg: #1a1715;
+            --input-bg-focus: #161412;
+        }
+
+        /* Quitamos el padding global del body */
+        body { 
+            background-color: var(--bg-page); 
+            color: var(--text-main); 
+            font-family: 'Nunito', sans-serif;
+            transition: background-color 0.3s, color 0.3s;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        /* Clase por defecto para el Dashboard (Mantiene tu espacio inferior intacto) */
+        .body-dashboard {
+            padding-bottom: 40px;
+        }
+
+        /* Clase especial para Login/Register (Centrado perfecto, sin barra inferior) */
+        .body-auth {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding-bottom: 0;
+            background: radial-gradient(circle at center, var(--bg-page) 0%, rgba(139, 115, 85, 0.15) 100%);
+        }
+
+        [data-theme="dark"] .body-auth {
+            background: radial-gradient(circle at center, var(--bg-page) 0%, rgba(0,0,0,0.8) 100%);
+        }
+
+        .text-muted { color: var(--text-muted) !important; }
+
+        .app-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+
+        .form-control, .form-select { 
+            background-color: var(--input-bg); 
+            border: 1px solid var(--border-soft); 
+            color: var(--text-main); 
+            border-radius: 8px; 
+            font-weight: 600; 
+            transition: 0.3s; 
+        }
+        .form-control:focus, .form-select:focus { 
+            border-color: var(--accent-gold); 
+            box-shadow: 0 0 0 0.2rem rgba(199, 164, 122, 0.2); 
+            background-color: var(--input-bg-focus); 
+            color: var(--text-main); 
+        }
+        ::placeholder { color: var(--text-muted) !important; opacity: 0.6 !important; }
+
+        .btn-gradient-gold { 
+            background: linear-gradient(135deg, #dfc2a2 0%, var(--accent-gold-dark) 100%); 
+            color: #121212; 
+            font-weight: 800; 
+            border: none; 
+            border-radius: 8px; 
+            box-shadow: 0 4px 10px rgba(171, 134, 88, 0.3); 
+            transition: 0.3s; 
+        }
+        .btn-gradient-gold:hover { 
+            transform: translateY(-2px); 
+            box-shadow: 0 6px 15px rgba(171, 134, 88, 0.4); 
+            color: #121212; 
+        }
+        
+        .modal-content { background-color: var(--bg-panel); border: 1px solid var(--border-soft); border-radius: 16px; }
+        [data-theme="dark"] .modal-header .btn-close { filter: invert(1) grayscale(100%) brightness(200%); }
+
+        {% block extra_css %}{% endblock %}
+    </style>
+</head>
+
+<body class="{% block body_class %}body-dashboard{% endblock %}">
+    
+    {% block content %}{% endblock %}
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const toggleBtn = document.getElementById('themeToggle');
+        const icon = document.getElementById('themeIcon');
+        const html = document.documentElement;
+        
+        const savedTheme = localStorage.getItem('guardian_theme') || 'light';
+        html.setAttribute('data-theme', savedTheme);
+        if(savedTheme === 'dark' && icon) {
+            icon.classList.replace('bi-moon-fill', 'bi-sun-fill');
+        }
+
+        if(toggleBtn) {
+            toggleBtn.addEventListener('click', () => {
+                if (html.getAttribute('data-theme') === 'light') {
+                    html.setAttribute('data-theme', 'dark');
+                    localStorage.setItem('guardian_theme', 'dark');
+                    icon.classList.replace('bi-moon-fill', 'bi-sun-fill');
+                } else {
+                    html.setAttribute('data-theme', 'light');
+                    localStorage.setItem('guardian_theme', 'light');
+                    icon.classList.replace('bi-sun-fill', 'bi-moon-fill');
+                }
+            });
+        }
+    </script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,318 @@
+{% extends "base.html" %}
+
+{% block title %}Nuevo Admin - Guardian{% endblock %}
+
+{% block body_class %}body-auth{% endblock %}
+
+{% block extra_css %}
+<style>
+    .outer-frame {
+        padding: 1.2rem;
+        border-radius: 1.5rem;
+        border: 2px solid rgba(199, 164, 122, 0.15);
+        background: transparent;
+        box-shadow: inset 0 0 30px rgba(139, 115, 85, 0.05);
+        width: 100%;
+        max-width: 520px; /* Ancho idéntico al del Login para mantener consistencia */
+        position: relative;
+    }
+
+    [data-theme="dark"] .outer-frame {
+        border: 2px solid rgba(171, 134, 88, 0.1);
+        box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.3);
+    }
+
+    .login-card {
+        background-color: var(--bg-panel);
+        border-radius: 1rem;
+        padding: 2rem 2.5rem; /* Ajuste de padding para que quede más compacto */
+        box-shadow: var(--shadow-soft), 0 0 0 1px var(--border-soft);
+    }
+
+    .brand-logo-container {
+        text-align: center;
+        margin-bottom: 1.2rem;
+    }
+
+    .brand-logo-container h3 {
+        font-family: 'Georgia', serif;
+        font-size: 1.5rem;
+        color: var(--text-main);
+        font-weight: 700;
+        margin-bottom: 0.2rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+    }
+
+    .brand-subtitle {
+        font-size: 0.75rem;
+        color: var(--text-muted);
+        letter-spacing: 0.5px;
+    }
+
+    .section-label {
+        font-size: 0.7rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: var(--text-muted);
+        font-weight: 800;
+        margin-top: 1rem;
+        margin-bottom: 0.4rem;
+        display: block;
+    }
+
+    /* Ocultamos el margen inferior de los input-group cuando están dentro de row */
+    .row .input-group {
+        margin-bottom: 0;
+    }
+
+    .input-group {
+        background-color: var(--input-bg);
+        border: 1px solid var(--border-soft);
+        border-radius: 8px;
+        transition: 0.3s;
+        overflow: hidden;
+        margin-bottom: 0.8rem;
+    }
+    
+    .input-group:focus-within {
+        border-color: var(--accent-gold);
+        box-shadow: 0 0 0 0.2rem rgba(199, 164, 122, 0.15);
+        background-color: var(--input-bg-focus);
+    }
+
+    .input-group-text {
+        background-color: transparent;
+        border: none;
+        color: var(--text-muted);
+        padding-right: 0.4rem;
+        padding-left: 0.8rem;
+        width: 40px;
+        display: flex;
+        justify-content: center;
+    }
+
+    .form-control {
+        border: none;
+        background-color: transparent;
+        padding-left: 0.2rem;
+        font-weight: 600;
+        color: var(--text-main);
+        font-size: 0.9rem;
+        height: 40px; /* Inputs un poco más finos */
+    }
+    
+    .form-control:focus {
+         box-shadow: none;
+         background-color: transparent;
+    }
+
+    .form-text {
+        color: var(--text-muted);
+        font-size: 0.7rem;
+        margin-top: 0.2rem;
+        margin-bottom: 1rem;
+        padding-left: 0.2rem;
+        font-weight: 600;
+    }
+
+    .master-box {
+        background-color: rgba(199, 164, 122, 0.05);
+        border: 1px solid rgba(199, 164, 122, 0.2);
+        border-radius: 12px;
+        padding: 1rem;
+        margin-top: 0.5rem;
+        margin-bottom: 1.2rem;
+    }
+    
+    [data-theme="dark"] .master-box {
+        background-color: rgba(171, 134, 88, 0.05);
+        border: 1px solid rgba(171, 134, 88, 0.15);
+    }
+    
+    .master-box .section-label {
+        margin-top: 0;
+        color: var(--text-main);
+    }
+
+    .master-box .input-group {
+        margin-bottom: 0;
+        background-color: var(--bg-panel);
+    }
+
+    .btn-login {
+        width: 100%;
+        font-size: 1rem;
+        padding: 0.7rem;
+        background: linear-gradient(180deg, #f5eadd 0%, #e2cba9 100%);
+        color: #45362b;
+        border: 1px solid #cfae85;
+        font-weight: 800;
+        border-radius: 8px;
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6), 0 2px 4px rgba(139, 115, 85, 0.15);
+        transition: 0.2s;
+    }
+    
+    .btn-login:hover {
+        background: linear-gradient(180deg, #faefdf 0%, #e6cfad 100%);
+        transform: translateY(-1px);
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8), 0 4px 8px rgba(139, 115, 85, 0.2);
+    }
+    
+    [data-theme="dark"] .btn-login {
+        background: linear-gradient(180deg, #c7a47a 0%, #9e794c 100%);
+        color: #161412;
+        border: 1px solid #735532;
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 2px 4px rgba(0, 0, 0, 0.5);
+    }
+    
+    [data-theme="dark"] .btn-login:hover {
+        background: linear-gradient(180deg, #d3b48e 0%, #ab8658 100%);
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.3), 0 4px 8px rgba(0, 0, 0, 0.6);
+    }
+
+    .forgot-link {
+        font-size: 0.8rem;
+        color: var(--text-muted);
+        text-decoration: none;
+        transition: 0.2s;
+        font-weight: 600;
+    }
+    
+    .forgot-link:hover {
+        color: var(--accent-gold-dark);
+    }
+
+    .theme-toggle-login {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: var(--bg-panel);
+        border: 1px solid var(--border-soft);
+        color: var(--accent-gold-dark);
+        width: 42px;
+        height: 42px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        box-shadow: var(--shadow-card);
+        transition: 0.3s;
+        z-index: 1000;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<button id="themeToggle" class="theme-toggle-login" title="Cambiar Tema">
+    <i class="bi bi-moon-fill" id="themeIcon"></i>
+</button>
+
+<div class="outer-frame">
+    <div class="login-card">
+        <div class="brand-logo-container">
+            <h3><i class="bi bi-person-plus-fill" style="color: var(--status-green);"></i> Alta Admin</h3>
+            <div class="brand-subtitle">Crear nueva cuenta de gestión</div>
+        </div>
+        
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-dismissible fade show shadow-sm" style="background-color: var(--status-red-bg); color: var(--status-red); border: 1px solid var(--status-red); border-radius: 8px; font-size: 0.8rem; padding: 0.5rem 1rem; margin-bottom: 1.2rem;" role="alert">
+                        <i class="bi bi-exclamation-octagon me-2"></i>{{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" style="padding: 0.75rem;"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <form method="POST">
+            <span class="section-label" style="margin-top: 0;">Credenciales</span>
+            
+            <div class="row g-2 mb-2">
+                <div class="col-sm-6">
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="bi bi-person-fill"></i></span>
+                        <input type="text" name="username" class="form-control" placeholder="Usuario" required autofocus>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="bi bi-card-heading"></i></span>
+                        <input type="text" name="dni" class="form-control" placeholder="DNI" required>
+                    </div>
+                </div>
+            </div>
+
+            <div class="input-group mb-2">
+                <span class="input-group-text"><i class="bi bi-key-fill" style="transform: rotate(45deg);"></i></span>
+                <input type="password" name="password" class="form-control" id="regPass" placeholder="Contraseña" required>
+                <button class="btn input-group-text" type="button" id="toggleRegPass" style="border-left: 1px solid var(--border-soft); border-radius: 0; width: auto; padding: 0 15px;">
+                    <i class="bi bi-eye-slash-fill" id="eyeIconReg"></i>
+                </button>
+            </div>
+
+            <span class="section-label">Seguridad y Recuperación</span>
+            
+            <div class="row g-2 mb-1">
+                <div class="col-sm-6">
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="bi bi-whatsapp" style="color: var(--status-green);"></i></span>
+                        <input type="text" name="phone" class="form-control" placeholder="WhatsApp (+549...)" required>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="bi bi-shield-lock-fill" style="color: var(--status-red);"></i></span>
+                        <input type="text" name="recovery_pin" class="form-control" placeholder="PIN Secreto" maxlength="6" required>
+                    </div>
+                </div>
+            </div>
+            <div class="form-text text-start">PIN (4-6 dígitos) útil si pierdes tu contraseña.</div>
+            
+            <div class="master-box">
+                <span class="section-label">Código Maestro de Autorización</span>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-award-fill" style="color: var(--accent-gold-dark);"></i></span>
+                    <input type="password" name="secret_code" class="form-control" placeholder="Ingresa el código master..." required>
+                </div>
+                <div class="text-end mt-1"><small style="color: var(--text-muted); font-size: 0.65rem; font-weight: 700;">(Dev: MASTER123)</small></div>
+            </div>
+            
+            <button type="submit" class="btn-login mb-3">
+                Registrar Administrador
+            </button>
+            
+            <div class="text-center">
+                <a href="/login" class="forgot-link">
+                    <i class="bi bi-arrow-left me-1"></i> Volver al Login
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    const toggleBtn = document.querySelector('#toggleRegPass');
+    const passInput = document.querySelector('#regPass');
+    const eyeIcon = document.querySelector('#eyeIconReg');
+
+    if(toggleBtn) {
+        toggleBtn.addEventListener('click', function () {
+            const type = passInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passInput.setAttribute('type', type);
+            
+            if (type === 'text') {
+                eyeIcon.classList.replace('bi-eye-slash-fill', 'bi-eye-fill');
+            } else {
+                eyeIcon.classList.replace('bi-eye-fill', 'bi-eye-slash-fill');
+            }
+        });
+    }
+</script>
+{% endblock %}
